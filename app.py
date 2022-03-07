@@ -21,8 +21,8 @@ base.prepare(engine,reflect = True)
 # View all of the classes that automap found
 base.classes.keys()
 # Save references to each table
-measurement = base.classes.measurement
-station = base.classes.station
+Measurement = base.classes.measurement
+Station = base.classes.station
 # Create our session (link) from Python to the DB
 session = Session(engine)
 app = Flask(__name__)
@@ -40,16 +40,15 @@ def welcome():
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     one_year_prior = dt.date(2017,8,23) - dt.timedelta(days = 365)
-
-    date_precip = session.query(measurement.date,measurement.prcp).\
-    filter(measurement.date >= one_year_prior,measurement.prcp != None).\
-    order_by(measurement.date).all()   
-
+    date_precip = session.query(Measurement.date,Measurement.prcp).\
+    filter(Measurement.date >= one_year_prior,Measurement.prcp != None).\
+    order_by(Measurement.date).all()   
     return jsonify(dict(date_precip))
 
 @app.route("/api/v1.0/stations")
 def stations():
-    list_stations = session.query(measurement.station).distinct().all()
+    session = Session(engine)
+    list_stations = session.query(Station.station).all()
     return jsonify(list(list_stations))
 
 @app.route("/api/v1.0/tobs")
